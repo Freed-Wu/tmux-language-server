@@ -1,0 +1,4 @@
+#!/usr/bin/env -S pip install -r
+
+# groff
+tree-sitter-lsp[misc] >= 0.0.10

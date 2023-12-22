@@ -31,17 +31,46 @@ def get_parser():
 
         shtab.add_argument_to(parser)
     parser.add_argument("--version", version=VERSION, action="version")
+    parser.add_argument(
+        "--generate-schema",
+        choices=["tmux"],  # type: ignore
+        help="generate schema in an output format",
+    )
+    parser.add_argument(
+        "--indent",
+        type=int,
+        default=2,
+        help="generated json's indent",
+    )
+    parser.add_argument(
+        "--output-format",
+        choices=["json", "yaml", "toml"],
+        default="json",
+        help="output format: %(default)s",
+    )
     return parser
 
 
 def main():
     r"""Parse arguments and provide shell completions."""
-    parser = get_parser()
-    parser.parse_args()
+    args = get_parser().parse_args()
 
-    from .server import MuttLanguageServer
+    from .server import TmuxLanguageServer
 
-    MuttLanguageServer(NAME, __version__).start_io()
+    if args.generate_schema:
+        from tree_sitter_lsp.utils import pprint
+
+        if args.generate_schema:
+            from .misc import get_schema
+
+            pprint(
+                get_schema(),
+                filetype=args.output_format,
+                indent=args.indent,
+            )
+            return None
+
+    TmuxLanguageServer(NAME, __version__).start_io()
 
 
 if __name__ == "__main__":
