@@ -55,8 +55,6 @@ def main():
     r"""Parse arguments and provide shell completions."""
     args = get_parser().parse_args()
 
-    from .server import TmuxLanguageServer
-
     if args.generate_schema:
         from tree_sitter_lsp.utils import pprint
 
@@ -69,6 +67,8 @@ def main():
                 indent=args.indent,
             )
             return None
+
+    from .server import TmuxLanguageServer
 
     TmuxLanguageServer(NAME, __version__).start_io()
 
