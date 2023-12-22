@@ -49,6 +49,8 @@ class TmuxLanguageServer(LanguageServer):
                 params.text_document.uri, params.position, True
             )
             properties = get_schema().get("properties", {})
+            if _range.start.character != 0:
+                properties = properties.get("set", {}).get("properties", {})
             description = properties.get(word, {}).get("description", "")
             if not description:
                 return None
@@ -64,14 +66,18 @@ class TmuxLanguageServer(LanguageServer):
             :type params: CompletionParams
             :rtype: CompletionList
             """
-            word, _ = self._cursor_word(
+            word, _range = self._cursor_word(
                 params.text_document.uri, params.position, False
             )
             properties = get_schema().get("properties", {})
+            kind = CompletionItemKind.Function
+            if _range.start.character != 0:
+                properties = properties.get("set", {}).get("properties", {})
+                kind = CompletionItemKind.Constant
             items = [
                 CompletionItem(
                     x,
-                    kind=CompletionItemKind.Function,
+                    kind=kind,
                     documentation=MarkupContent(
                         MarkupKind.Markdown, property.get("description", "")
                     ),
@@ -99,7 +105,7 @@ class TmuxLanguageServer(LanguageServer):
         uri: str,
         position: Position,
         include_all: bool = True,
-        regex: str = r"\w+",
+        regex: str = r"[\w-]+",
     ) -> tuple[str, Range]:
         """Cursor word.
 

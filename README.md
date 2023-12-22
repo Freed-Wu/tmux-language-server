@@ -37,14 +37,16 @@
 [![pypi/implementation](https://shields.io/pypi/implementation/tmux-language-server)](https://pypi.org/project/tmux-language-server/#files)
 [![pypi/pyversions](https://shields.io/pypi/pyversions/tmux-language-server)](https://pypi.org/project/tmux-language-server/#files)
 
-A language server for (neo)tmux's tmuxrc.
+A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 
-- [x] document hover
-- [x] completion
+- [ ] [Diagnostic](https://microsoft.github.io/language-server-protocol/specifications/specification-current#diagnostic)
+- [ ] [Document Link](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_documentLink)
+- [x] [Hover](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_hover)
+- [x] [Completion](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_completion)
 
-![Document hover](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/87776386-0d88-4fd1-815f-45f37ed1ed18)
+![Document hover](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/631db877-4cde-4b87-9548-c0a66335a83d)
 
-![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/8f5a7a78-a0d9-43a0-bcc3-8217cd78f8cf)
+![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a9793a05-7da6-4fcb-88bf-4ca82ccfbfc1)
 
 See
 [![readthedocs](https://shields.io/readthedocs/tmux-language-server)](https://tmux-language-server.readthedocs.io)
