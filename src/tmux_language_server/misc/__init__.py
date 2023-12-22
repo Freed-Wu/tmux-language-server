@@ -1,6 +1,7 @@
 r"""Misc
 ========
 """
+import re
 from typing import Any
 
 from bs4.element import NavigableString, Tag
@@ -9,6 +10,7 @@ from tree_sitter_lsp.misc import get_soup
 from .._metainfo import SOURCE, project
 
 ALIAS_PREFIX = "(alias: "
+PAT = re.compile(r"[a-z-]+")
 
 
 def get_schema() -> dict[str, Any]:
@@ -29,6 +31,7 @@ def get_schema() -> dict[str, Any]:
     }
     soup = get_soup("tmux.1", "groff", "mdoc")
     p = soup.find("p", string="CLIENTS AND SESSIONS")
+    isoption = 0
     while p and p.text != "EXIT MESSAGES":
         b = p.find("b")
         if (
@@ -43,17 +46,44 @@ def get_schema() -> dict[str, Any]:
             if not p:
                 continue
             b = p.find("b")
+            alias = None
             if p.text.startswith(ALIAS_PREFIX) and isinstance(b, Tag):
                 alias = b.text
-                description += "\n" + alias
+                description += "\n" + description.replace(name, alias)
                 p = p.find_next("p")
-            else:
-                alias = name
             if not p:
                 continue
+            _type = "string"
+            if name.endswith("[]"):
+                name = name.rstrip("[]")
+                _type = "array"
+            if not PAT.fullmatch(name):
+                continue
+            if name == "backspace":
+                isoption = 1
+                schema["properties"]["set"]["properties"] = {}
+            if isoption:
+                description = f"""```tmux
+set {description}
+```
+"""
+            else:
+                description = f"""```tmux
+{description}
+```
+"""
             description += "\n" + p.text.replace("\n", " ")
-            schema["properties"][name] = schema["properties"][alias] = {
-                "description": description
-            }
+            description = description.replace("\u2212", "-")
+            if isoption:
+                schema["properties"]["set"]["properties"][name] = {
+                    "description": description,
+                    "type": _type,
+                }
+            else:
+                schema["properties"][name] = {"description": description}
+                if alias:
+                    schema["properties"][alias] = {"description": description}
+            if name == "window-style":
+                isoption = 0
         p = p.find_next("p")
     return schema
