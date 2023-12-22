@@ -48,12 +48,12 @@ class TmuxLanguageServer(LanguageServer):
             word, _range = self._cursor_word(
                 params.text_document.uri, params.position, True
             )
-            result = get_schema().get(word)
-            if not result:
+            properties = get_schema().get("properties", {})
+            description = properties.get(word, {}).get("description", "")
+            if not description:
                 return None
             return Hover(
-                MarkupContent(MarkupKind.PlainText, result),
-                _range,
+                MarkupContent(MarkupKind.Markdown, description), _range
             )
 
         @self.feature(TEXT_DOCUMENT_COMPLETION)
@@ -67,14 +67,17 @@ class TmuxLanguageServer(LanguageServer):
             word, _ = self._cursor_word(
                 params.text_document.uri, params.position, False
             )
+            properties = get_schema().get("properties", {})
             items = [
                 CompletionItem(
                     x,
                     kind=CompletionItemKind.Function,
-                    documentation=doc,
+                    documentation=MarkupContent(
+                        MarkupKind.Markdown, property.get("description", "")
+                    ),
                     insert_text=x,
                 )
-                for x, doc in get_schema().items()
+                for x, property in properties.items()
                 if x.startswith(word)
             ]
             return CompletionList(False, items)
