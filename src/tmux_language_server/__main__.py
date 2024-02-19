@@ -44,6 +44,18 @@ def get_parser():
         help="generated json's indent",
     )
     parser.add_argument(
+        "--check",
+        nargs="*",
+        default={},
+        help="check file's errors and warnings",
+    )
+    parser.add_argument(
+        "--color",
+        choices=["auto", "always", "never"],
+        default="auto",
+        help="when to display color, default: %(default)s",
+    )
+    parser.add_argument(
         "--output-format",
         choices=["json", "yaml", "toml"],
         default="json",
@@ -56,8 +68,12 @@ def main():
     r"""Parse arguments and provide shell completions."""
     args = get_parser().parse_args()
 
-    if args.generate_schema:
+    if args.generate_schema or args.check:
+        from tree_sitter_lsp.diagnose import check
         from tree_sitter_lsp.utils import pprint
+        from tree_sitter_tmux import parser
+
+        from .finders import DIAGNOSTICS_FINDER_CLASSES
 
         if args.generate_schema:
             from .misc import get_schema
@@ -68,6 +84,15 @@ def main():
                 indent=args.indent,
             )
             return None
+        exit(
+            check(
+                args.check,
+                parser.parse,
+                DIAGNOSTICS_FINDER_CLASSES,
+                None,
+                args.color,
+            )
+        )
 
     from .server import TmuxLanguageServer
 

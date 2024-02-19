@@ -6,14 +6,45 @@ import json
 import os
 from typing import Any
 
+from tree_sitter.binding import Query
+
+from . import FILETYPE
+
 SCHEMAS = {}
+QUERIES = {}
 
 
-def get_schema(filetype: str = "tmux") -> dict[str, Any]:
+def get_query(name: str, filetype: FILETYPE = "tmux") -> Query:
+    r"""Get query.
+
+    :param name:
+    :type name: str
+    :param filetype:
+    :type filetype: FILETYPE
+    :rtype: Query
+    """
+    if name not in QUERIES:
+        with open(
+            os.path.join(
+                os.path.join(
+                    os.path.join(os.path.dirname(__file__), "assets"),
+                    "queries",
+                ),
+                f"{name}{os.path.extsep}scm",
+            )
+        ) as f:
+            text = f.read()
+        from tree_sitter_tmux import language
+
+        QUERIES[name] = language.query(text)
+    return QUERIES[name]
+
+
+def get_schema(filetype: FILETYPE = "tmux") -> dict[str, Any]:
     r"""Get schema.
 
     :param filetype:
-    :type filetype: str
+    :type filetype: FILETYPE
     :rtype: dict[str, Any]
     """
     if filetype not in SCHEMAS:
