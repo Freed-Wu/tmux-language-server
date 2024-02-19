@@ -1,4 +1,5 @@
 r"""Test utils."""
+
 from tmux_language_server.utils import get_schema
 
 
