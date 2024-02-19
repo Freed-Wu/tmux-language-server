@@ -1,6 +1,7 @@
 r"""Utils
 =========
 """
+
 import json
 import os
 from typing import Any
@@ -23,6 +24,6 @@ def get_schema(filetype: str = "tmux") -> dict[str, Any]:
             ),
             f"{filetype}.json",
         )
-        with open(file, "r") as f:
+        with open(file) as f:
             SCHEMAS[filetype] = json.load(f)
     return SCHEMAS[filetype]
