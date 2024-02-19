@@ -2,25 +2,32 @@ r"""Server
 ==========
 """
 
-import re
 from typing import Any
 
 from lsprotocol.types import (
     TEXT_DOCUMENT_COMPLETION,
+    TEXT_DOCUMENT_DID_CHANGE,
+    TEXT_DOCUMENT_DID_OPEN,
+    TEXT_DOCUMENT_DOCUMENT_LINK,
     TEXT_DOCUMENT_HOVER,
     CompletionItem,
     CompletionItemKind,
     CompletionList,
     CompletionParams,
+    DidChangeTextDocumentParams,
+    DocumentLink,
+    DocumentLinkParams,
     Hover,
     MarkupContent,
     MarkupKind,
-    Position,
-    Range,
     TextDocumentPositionParams,
 )
 from pygls.server import LanguageServer
+from tree_sitter_lsp.diagnose import get_diagnostics
+from tree_sitter_lsp.finders import PositionFinder
+from tree_sitter_tmux import parser
 
+from .finders import DIAGNOSTICS_FINDER_CLASSES, ImportTmuxFinder
 from .utils import get_schema
 
 
@@ -37,6 +44,39 @@ class TmuxLanguageServer(LanguageServer):
         :rtype: None
         """
         super().__init__(*args, **kwargs)
+        self.trees = {}
+
+        @self.feature(TEXT_DOCUMENT_DID_OPEN)
+        @self.feature(TEXT_DOCUMENT_DID_CHANGE)
+        def did_change(params: DidChangeTextDocumentParams) -> None:
+            r"""Did change.
+
+            :param params:
+            :type params: DidChangeTextDocumentParams
+            :rtype: None
+            """
+            document = self.workspace.get_document(params.text_document.uri)
+            self.trees[document.uri] = parser.parse(document.source.encode())
+            diagnostics = get_diagnostics(
+                document.uri,
+                self.trees[document.uri],
+                DIAGNOSTICS_FINDER_CLASSES,
+                "tmux",
+            )
+            self.publish_diagnostics(params.text_document.uri, diagnostics)
+
+        @self.feature(TEXT_DOCUMENT_DOCUMENT_LINK)
+        def document_link(params: DocumentLinkParams) -> list[DocumentLink]:
+            r"""Get document links.
+
+            :param params:
+            :type params: DocumentLinkParams
+            :rtype: list[DocumentLink]
+            """
+            document = self.workspace.get_document(params.text_document.uri)
+            return ImportTmuxFinder().get_document_links(
+                document.uri, self.trees[document.uri]
+            )
 
         @self.feature(TEXT_DOCUMENT_HOVER)
         def hover(params: TextDocumentPositionParams) -> Hover | None:
@@ -46,17 +86,25 @@ class TmuxLanguageServer(LanguageServer):
             :type params: TextDocumentPositionParams
             :rtype: Hover | None
             """
-            word, _range = self._cursor_word(
-                params.text_document.uri, params.position, True
+            document = self.workspace.get_document(params.text_document.uri)
+            uni = PositionFinder(params.position).find(
+                document.uri, self.trees[document.uri]
             )
-            properties = get_schema().get("properties", {})
-            if _range.start.character != 0:
-                properties = properties.get("set", {}).get("properties", {})
-            description = properties.get(word, {}).get("description", "")
-            if not description:
+            if uni is None:
+                return None
+            text = uni.get_text()
+            result = None
+            if uni.node.range.start_point[1] == 0:
+                result = get_schema()["properties"].get(text)
+            elif uni.node.type == "option":
+                result = get_schema()["properties"]["set"]["properties"].get(
+                    text
+                )
+            if result is None:
                 return None
             return Hover(
-                MarkupContent(MarkupKind.Markdown, description), _range
+                MarkupContent(MarkupKind.Markdown, result["description"]),
+                uni.get_range(),
             )
 
         @self.feature(TEXT_DOCUMENT_COMPLETION)
@@ -67,72 +115,45 @@ class TmuxLanguageServer(LanguageServer):
             :type params: CompletionParams
             :rtype: CompletionList
             """
-            word, _range = self._cursor_word(
-                params.text_document.uri, params.position, False
+            document = self.workspace.get_document(params.text_document.uri)
+            uni = PositionFinder(params.position, right_equal=True).find(
+                document.uri, self.trees[document.uri]
             )
-            properties = get_schema().get("properties", {})
-            kind = CompletionItemKind.Function
-            if _range.start.character != 0:
-                properties = properties.get("set", {}).get("properties", {})
-                kind = CompletionItemKind.Constant
-            items = [
-                CompletionItem(
-                    x,
-                    kind=kind,
-                    documentation=MarkupContent(
-                        MarkupKind.Markdown, property.get("description", "")
-                    ),
-                    insert_text=x,
+            if uni is None:
+                return CompletionList(False, [])
+            text = uni.get_text()
+            if uni.node.range.start_point[1] == 0:
+                return CompletionList(
+                    False,
+                    [
+                        CompletionItem(
+                            x,
+                            kind=CompletionItemKind.Keyword,
+                            documentation=MarkupContent(
+                                MarkupKind.Markdown, property["description"]
+                            ),
+                            insert_text=x,
+                        )
+                        for x, property in get_schema()["properties"].items()
+                        if x.startswith(text)
+                    ],
                 )
-                for x, property in properties.items()
-                if x.startswith(word)
-            ]
-            return CompletionList(False, items)
-
-    def _cursor_line(self, uri: str, position: Position) -> str:
-        r"""Cursor line.
-
-        :param uri:
-        :type uri: str
-        :param position:
-        :type position: Position
-        :rtype: str
-        """
-        document = self.workspace.get_document(uri)
-        return document.source.splitlines()[position.line]
-
-    def _cursor_word(
-        self,
-        uri: str,
-        position: Position,
-        include_all: bool = True,
-        regex: str = r"[\w-]+",
-    ) -> tuple[str, Range]:
-        """Cursor word.
-
-        :param self:
-        :param uri:
-        :type uri: str
-        :param position:
-        :type position: Position
-        :param include_all:
-        :type include_all: bool
-        :param regex:
-        :type regex: str
-        :rtype: tuple[str, Range]
-        """
-        line = self._cursor_line(uri, position)
-        for m in re.finditer(regex, line):
-            if m.start() <= position.character <= m.end():
-                end = m.end() if include_all else position.character
-                return (
-                    line[m.start() : end],
-                    Range(
-                        Position(position.line, m.start()),
-                        Position(position.line, end),
-                    ),
+            elif uni.node.type == "option":
+                return CompletionList(
+                    False,
+                    [
+                        CompletionItem(
+                            x,
+                            kind=CompletionItemKind.Variable,
+                            documentation=MarkupContent(
+                                MarkupKind.Markdown, property["description"]
+                            ),
+                            insert_text=x,
+                        )
+                        for x, property in get_schema()["properties"]["set"][
+                            "properties"
+                        ].items()
+                        if x.startswith(text)
+                    ],
                 )
-        return (
-            "",
-            Range(Position(position.line, 0), Position(position.line, 0)),
-        )
+            return CompletionList(False, [])
