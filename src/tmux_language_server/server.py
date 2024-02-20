@@ -97,9 +97,9 @@ class TmuxLanguageServer(LanguageServer):
             if uni.node.range.start_point[1] == 0:
                 result = get_schema()["properties"].get(text)
             elif uni.node.type == "option":
-                result = get_schema()["properties"]["set"]["properties"].get(
-                    text
-                )
+                result = get_schema()["properties"]["set-option"][
+                    "properties"
+                ].get(text)
             if result is None:
                 return None
             return Hover(
@@ -150,9 +150,9 @@ class TmuxLanguageServer(LanguageServer):
                             ),
                             insert_text=x,
                         )
-                        for x, property in get_schema()["properties"]["set"][
-                            "properties"
-                        ].items()
+                        for x, property in get_schema()["properties"][
+                            "set-option"
+                        ]["properties"].items()
                         if x.startswith(text)
                     ],
                 )
