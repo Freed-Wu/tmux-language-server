@@ -23,6 +23,7 @@ from lsprotocol.types import (
     TextDocumentPositionParams,
 )
 from pygls.server import LanguageServer
+from tree_sitter_lsp.complete import get_completion_list_by_enum
 from tree_sitter_lsp.diagnose import get_diagnostics
 from tree_sitter_lsp.finders import PositionFinder
 from tree_sitter_tmux import parser
@@ -155,5 +156,18 @@ class TmuxLanguageServer(LanguageServer):
                         ]["properties"].items()
                         if x.startswith(text)
                     ],
+                )
+            parent = uni.node
+            while parent and not (
+                len(parent.children) > 2
+                and parent.children[-2].type == "option"
+            ):
+                parent = parent.parent
+            if parent:
+                return get_completion_list_by_enum(
+                    text,
+                    get_schema()["properties"]["set-option"]["properties"].get(
+                        uni.node2text(parent.children[-2]), {}
+                    ),
                 )
             return CompletionList(False, [])
