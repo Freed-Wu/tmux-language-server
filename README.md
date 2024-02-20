@@ -46,9 +46,11 @@ A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 
 ![Diagnostic](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a92a7d41-4ade-486b-98ef-14382d6d4722)
 
-![Document hover](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/631db877-4cde-4b87-9548-c0a66335a83d)
+![option](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/631db877-4cde-4b87-9548-c0a66335a83d)
 
-![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a9793a05-7da6-4fcb-88bf-4ca82ccfbfc1)
+![command](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a9793a05-7da6-4fcb-88bf-4ca82ccfbfc1)
+
+![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/eefc7ec5-c8ef-41ac-8194-e939dac7ae36)
 
 See
 [![readthedocs](https://shields.io/readthedocs/tmux-language-server)](https://tmux-language-server.readthedocs.io)
