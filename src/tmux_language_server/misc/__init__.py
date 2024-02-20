@@ -31,7 +31,9 @@ def get_schema() -> dict[str, Any]:
             f"`{project} --generate-schema={filetype}`."
         ),
         "type": "object",
-        "properties": {},
+        "properties": {
+            "patternProperties": {"@[-_\\da-zA-Z]": {"type": "string"}}
+        },
     }
     soup = get_soup("tmux.1", "groff", "mdoc")
     p = soup.find("p", string="CLIENTS AND SESSIONS")
@@ -66,7 +68,12 @@ def get_schema() -> dict[str, Any]:
             if name == "backspace":
                 isoption = 1
                 schema["properties"]["set"]["properties"] = {}
+            s = ""
+            enum = []
             if isoption:
+                s = "".join(description.split()[1:])
+                if s.startswith("[") and s.endswith("]"):
+                    enum = [t.strip() for t in s.strip("[]").split("|")]
                 description = f"""```tmux
 set {description}
 ```
@@ -83,6 +90,21 @@ set {description}
                     "description": description,
                     "type": _type,
                 }
+                if len(enum) > 1:
+                    schema["properties"]["set"]["properties"][name]["enum"] = (
+                        enum
+                    )
+                if s in {
+                    "number",
+                    "height",
+                    "width",
+                    "index",
+                    "time",
+                    "lines",
+                }:
+                    schema["properties"]["set"]["properties"][name][
+                        "pattern"
+                    ] = "\\d+"
             else:
                 schema["properties"][name] = {"description": description}
                 if alias:
