@@ -31,9 +31,7 @@ def get_schema() -> dict[str, Any]:
             f"`{project} --generate-schema={filetype}`."
         ),
         "type": "object",
-        "properties": {
-            "patternProperties": {"@[-_\\da-zA-Z]": {"type": "string"}}
-        },
+        "properties": {},
     }
     soup = get_soup("tmux.1", "groff", "mdoc")
     p = soup.find("p", string="CLIENTS AND SESSIONS")
@@ -67,7 +65,7 @@ def get_schema() -> dict[str, Any]:
                 continue
             if name == "backspace":
                 isoption = 1
-                schema["properties"]["set"]["properties"] = {}
+                schema["properties"]["set-option"]["properties"] = {}
             s = ""
             enum = []
             if isoption:
@@ -86,14 +84,14 @@ set {description}
             description += "\n" + p.text.replace("\n", " ")
             description = description.replace("\u2212", "-")
             if isoption:
-                schema["properties"]["set"]["properties"][name] = {
+                schema["properties"]["set-option"]["properties"][name] = {
                     "description": description,
                     "type": _type,
                 }
                 if len(enum) > 1:
-                    schema["properties"]["set"]["properties"][name]["enum"] = (
-                        enum
-                    )
+                    schema["properties"]["set-option"]["properties"][name][
+                        "enum"
+                    ] = enum
                 if s in {
                     "number",
                     "height",
@@ -102,7 +100,7 @@ set {description}
                     "time",
                     "lines",
                 }:
-                    schema["properties"]["set"]["properties"][name][
+                    schema["properties"]["set-option"]["properties"][name][
                         "pattern"
                     ] = "\\d+"
             else:
@@ -112,4 +110,8 @@ set {description}
             if name == "window-style":
                 isoption = 0
         p = p.find_next("p")
+    data = {"type": "array", "uniqueItems": True, "items": {"type": "string"}}
+    schema["properties"]["source-file"] |= data
+    data = {"patternProperties": {"@[-_\\da-zA-Z]": {"type": "string"}}}
+    schema["properties"]["set-option"] |= data
     return schema

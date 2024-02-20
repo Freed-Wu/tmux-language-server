@@ -44,6 +44,8 @@ A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 - [x] [Hover](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_hover)
 - [x] [Completion](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_completion)
 
+![Diagnostic](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a92a7d41-4ade-486b-98ef-14382d6d4722)
+
 ![Document hover](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/631db877-4cde-4b87-9548-c0a66335a83d)
 
 ![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a9793a05-7da6-4fcb-88bf-4ca82ccfbfc1)

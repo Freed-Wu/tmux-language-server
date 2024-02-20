@@ -56,6 +56,12 @@ def get_parser():
         help="when to display color, default: %(default)s",
     )
     parser.add_argument(
+        "--convert",
+        nargs="*",
+        default={},
+        help="convert files to output format",
+    )
+    parser.add_argument(
         "--output-format",
         choices=["json", "yaml", "toml"],
         default="json",
@@ -68,12 +74,13 @@ def main():
     r"""Parse arguments and provide shell completions."""
     args = get_parser().parse_args()
 
-    if args.generate_schema or args.check:
+    if args.generate_schema or args.check or args.convert:
         from tree_sitter_lsp.diagnose import check
         from tree_sitter_lsp.utils import pprint
         from tree_sitter_tmux import parser
 
         from .finders import DIAGNOSTICS_FINDER_CLASSES
+        from .schema import TmuxTrie
 
         if args.generate_schema:
             from .misc import get_schema
@@ -84,6 +91,12 @@ def main():
                 indent=args.indent,
             )
             return None
+        for file in args.convert:
+            pprint(
+                TmuxTrie.from_file(file, parser.parse).to_json(),
+                filetype=args.output_format,
+                indent=args.indent,
+            )
         exit(
             check(
                 args.check,
