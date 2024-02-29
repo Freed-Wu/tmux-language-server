@@ -1,5 +1,4 @@
 #!/usr/bin/env -S pip install -r
 
-# ErrorFinder
-tree-sitter-lsp >= 0.0.13
+lsp-tree-sitter
 tree-sitter-tmux
