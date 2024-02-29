@@ -6,7 +6,7 @@ import re
 from typing import Any
 
 from bs4.element import NavigableString, Tag
-from tree_sitter_lsp.misc import get_soup
+from lsp_tree_sitter.misc import get_soup
 
 from .._metainfo import SOURCE, project
 

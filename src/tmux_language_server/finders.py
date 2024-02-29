@@ -4,8 +4,8 @@ r"""Finders
 
 from dataclasses import dataclass
 
+from lsp_tree_sitter.finders import ErrorFinder, QueryFinder, SchemaFinder
 from lsprotocol.types import DiagnosticSeverity
-from tree_sitter_lsp.finders import ErrorFinder, QueryFinder, SchemaFinder
 
 from .schema import TmuxTrie
 from .utils import get_query, get_schema

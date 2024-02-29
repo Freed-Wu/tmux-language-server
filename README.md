@@ -52,6 +52,10 @@ A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 
 ![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/eefc7ec5-c8ef-41ac-8194-e939dac7ae36)
 
+## How Does It Work
+
+See [here](https://github.com/neomutt/lsp-tree-sitter#usage).
+
 See
 [![readthedocs](https://shields.io/readthedocs/tmux-language-server)](https://tmux-language-server.readthedocs.io)
 to know more.

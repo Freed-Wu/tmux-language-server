@@ -4,10 +4,10 @@ r"""Schema
 
 from dataclasses import dataclass
 
+from lsp_tree_sitter import UNI
+from lsp_tree_sitter.schema import Trie
 from lsprotocol.types import Position, Range
 from tree_sitter import Node
-from tree_sitter_lsp import UNI
-from tree_sitter_lsp.schema import Trie
 
 DIRECTIVES = {
     "set_option_directive",

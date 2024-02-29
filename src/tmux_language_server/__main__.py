@@ -75,8 +75,8 @@ def main():
     args = get_parser().parse_args()
 
     if args.generate_schema or args.check or args.convert:
-        from tree_sitter_lsp.diagnose import check
-        from tree_sitter_lsp.utils import pprint
+        from lsp_tree_sitter.diagnose import check
+        from lsp_tree_sitter.utils import pprint
         from tree_sitter_tmux import parser
 
         from .finders import DIAGNOSTICS_FINDER_CLASSES
