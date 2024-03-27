@@ -6,12 +6,16 @@ import json
 import os
 from typing import Any
 
-from tree_sitter import Query
+from tree_sitter import Language, Parser, Query
+from tree_sitter_tmux import language as get_language_ptr
 
 from . import FILETYPE
 
 SCHEMAS = {}
 QUERIES = {}
+language = Language(get_language_ptr(), "tmux")
+parser = Parser()
+parser.set_language(language)
 
 
 def get_query(name: str, filetype: FILETYPE = "tmux") -> Query:
@@ -33,8 +37,6 @@ def get_query(name: str, filetype: FILETYPE = "tmux") -> Query:
             )
         ) as f:
             text = f.read()
-        from tree_sitter_tmux import language
-
         QUERIES[name] = language.query(text)
     return QUERIES[name]
 

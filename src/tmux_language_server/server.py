@@ -26,10 +26,9 @@ from lsprotocol.types import (
     TextDocumentPositionParams,
 )
 from pygls.server import LanguageServer
-from tree_sitter_tmux import parser
 
 from .finders import DIAGNOSTICS_FINDER_CLASSES, ImportTmuxFinder
-from .utils import get_schema
+from .utils import get_schema, parser
 
 
 class TmuxLanguageServer(LanguageServer):
