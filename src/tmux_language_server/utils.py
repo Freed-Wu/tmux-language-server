@@ -15,7 +15,8 @@ SCHEMAS = {}
 QUERIES = {}
 language = Language(get_language_ptr())
 parser = Parser()
-parser.set_language(language)
+
+parser.language = language
 
 
 def get_query(name: str, filetype: FILETYPE = "tmux") -> Query:
