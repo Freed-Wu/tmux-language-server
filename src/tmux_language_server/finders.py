@@ -17,7 +17,7 @@ class ImportTmuxFinder(QueryFinder):
 
     def __init__(
         self,
-        message: str = "{{uni.get_text()}}: found",
+        message: str = "{{uni.text}}: found",
         severity: DiagnosticSeverity = DiagnosticSeverity.Information,
     ):
         r"""Init.
