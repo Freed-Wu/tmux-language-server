@@ -23,6 +23,7 @@ from lsprotocol.types import (
     Hover,
     MarkupContent,
     MarkupKind,
+    PublishDiagnosticsParams,
     TextDocumentPositionParams,
 )
 from pygls.lsp.server import LanguageServer
@@ -55,7 +56,9 @@ class TmuxLanguageServer(LanguageServer):
             :type params: DidChangeTextDocumentParams
             :rtype: None
             """
-            document = self.workspace.get_document(params.text_document.uri)
+            document = self.workspace.get_text_document(
+                params.text_document.uri
+            )
             self.trees[document.uri] = parser.parse(document.source.encode())
             diagnostics = get_diagnostics(
                 document.uri,
@@ -63,7 +66,12 @@ class TmuxLanguageServer(LanguageServer):
                 DIAGNOSTICS_FINDER_CLASSES,
                 "tmux",
             )
-            self.publish_diagnostics(params.text_document.uri, diagnostics)
+            self.text_document_publish_diagnostics(
+                PublishDiagnosticsParams(
+                    params.text_document.uri,
+                    diagnostics,
+                )
+            )
 
         @self.feature(TEXT_DOCUMENT_DOCUMENT_LINK)
         def document_link(params: DocumentLinkParams) -> list[DocumentLink]:
@@ -73,7 +81,9 @@ class TmuxLanguageServer(LanguageServer):
             :type params: DocumentLinkParams
             :rtype: list[DocumentLink]
             """
-            document = self.workspace.get_document(params.text_document.uri)
+            document = self.workspace.get_text_document(
+                params.text_document.uri
+            )
             return ImportTmuxFinder().get_document_links(
                 document.uri, self.trees[document.uri]
             )
@@ -86,7 +96,9 @@ class TmuxLanguageServer(LanguageServer):
             :type params: TextDocumentPositionParams
             :rtype: Hover | None
             """
-            document = self.workspace.get_document(params.text_document.uri)
+            document = self.workspace.get_text_document(
+                params.text_document.uri
+            )
             uni = PositionFinder(params.position).find(
                 document.uri, self.trees[document.uri]
             )
@@ -115,7 +127,9 @@ class TmuxLanguageServer(LanguageServer):
             :type params: CompletionParams
             :rtype: CompletionList
             """
-            document = self.workspace.get_document(params.text_document.uri)
+            document = self.workspace.get_text_document(
+                params.text_document.uri
+            )
             uni = PositionFinder(params.position, right_equal=True).find(
                 document.uri, self.trees[document.uri]
             )
