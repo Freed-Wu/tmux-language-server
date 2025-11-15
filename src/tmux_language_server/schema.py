@@ -32,9 +32,7 @@ class TmuxTrie(Trie):
         :rtype: "Trie"
         """
         if node.type == "value":
-            return cls(
-                UNI.node2range(node), parent, UNI.node2text(node).strip("'\"")
-            )
+            return cls(UNI(node).range, parent, UNI(node).text.strip("'\""))
         if node.type == "file":
             trie = cls(Range(Position(0, 0), Position(1, 0)), parent, {})
             for child in node.children:
@@ -46,7 +44,7 @@ class TmuxTrie(Trie):
                 _value: dict[str, Trie] = trie.value  # type: ignore
                 if _type not in _value:
                     trie.value[_type] = cls(  # type: ignore
-                        UNI.node2range(child),
+                        UNI(child).range,
                         trie,
                         {} if _type != "source-file" else [],
                     )
@@ -58,15 +56,15 @@ class TmuxTrie(Trie):
                 # fill subtrie.value
                 if child.type == "set_option_directive":
                     value: dict[str, Trie]
-                    value[UNI.node2text(child.children[-2])] = cls.from_node(
+                    value[UNI(child.children[-2]).text] = cls.from_node(
                         child.children[-1], subtrie
                     )
                 elif child.type == "source_file_directive":
                     value += [  # type: ignore
                         cls(
-                            UNI.node2range(child.children[1]),
+                            UNI(child.children[1]).range,
                             subtrie,
-                            UNI.node2text(child.children[1]),
+                            UNI(child.children[1]).text,
                         )
                     ]
             return trie
