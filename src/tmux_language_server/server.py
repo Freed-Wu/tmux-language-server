@@ -180,7 +180,7 @@ class TmuxLanguageServer(LanguageServer):
                 return get_completion_list_by_enum(
                     text,
                     get_schema()["properties"]["set-option"]["properties"].get(
-                        uni.node2text(parent.children[-2]), {}
+                        parent.children[-2].text, {}
                     ),
                 )
             return CompletionList(False, [])

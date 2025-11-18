@@ -3,6 +3,7 @@ r"""Schema
 """
 
 from dataclasses import dataclass
+from typing import Self
 
 from lsp_tree_sitter import UNI
 from lsp_tree_sitter.schema import Trie
@@ -19,17 +20,17 @@ DIRECTIVES = {
 class TmuxTrie(Trie):
     r"""Tmux Trie."""
 
-    value: dict[str, "Trie"] | list["Trie"] | str  # type: ignore
+    value: dict[str, Self] | list[Self] | str
 
     @classmethod
-    def from_node(cls, node: Node, parent: "Trie | None") -> "Trie":
+    def from_node(cls, node: Node, parent: Self | None) -> Self:
         r"""From node.
 
         :param node:
         :type node: Node
         :param parent:
-        :type parent: Trie | None
-        :rtype: "Trie"
+        :type parent: Self | None
+        :rtype: Self
         """
         if node.type == "value":
             return cls(UNI(node).range, parent, UNI(node).text.strip("'\""))
