@@ -79,7 +79,7 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
 ```toml
 [[language]]
 name = "tmux"
-language-servers = [ "tmux-language-server",]
+language-servers = ["tmux-language-server"]
 
 [language_server.tmux-language-server]
 command = "tmux-language-server"
@@ -93,7 +93,7 @@ command = "tmux-language-server"
 
 ```toml
 [language_server.tmux-language-server]
-filetypes = [ "tmux",]
+filetypes = ["tmux"]
 command = "tmux-language-server"
 ```
 
