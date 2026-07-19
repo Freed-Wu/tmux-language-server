@@ -39,11 +39,6 @@
 
 A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 
-- [x] [Diagnostic](https://microsoft.github.io/language-server-protocol/specifications/specification-current#diagnostic)
-- [x] [Document Link](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_documentLink)
-- [x] [Hover](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_hover)
-- [x] [Completion](https://microsoft.github.io/language-server-protocol/specifications/specification-current#textDocument_completion)
-
 ![Diagnostic](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a92a7d41-4ade-486b-98ef-14382d6d4722)
 
 ![option](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/631db877-4cde-4b87-9548-c0a66335a83d)
@@ -51,11 +46,3 @@ A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
 ![command](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a9793a05-7da6-4fcb-88bf-4ca82ccfbfc1)
 
 ![Completion](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/eefc7ec5-c8ef-41ac-8194-e939dac7ae36)
-
-## How Does It Work
-
-See [here](https://github.com/neomutt/lsp-tree-sitter#usage).
-
-See
-[![readthedocs](https://shields.io/readthedocs/tmux-language-server)](https://tmux-language-server.readthedocs.io)
-to know more.

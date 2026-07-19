@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+import re
+
+from bs4.element import NavigableString, Tag
+from lsp_tree_sitter.misc import get_soup
+
+SOURCE = "https://github.com/Freed-Wu/tmux-language-server"
+ALIAS_PREFIX = "(alias: "
+PAT = re.compile(r"[a-z-]+")
+
+filetype = "tmux"
+schema = {
+    "$id": (
+        f"{SOURCE}/blob/main/"
+        f"src/termux_language_server/assets/json/{filetype}.json"
+    ),
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": (
+        "Don't edit this file directly! It is generated automatically."
+    ),
+    "type": "object",
+    "properties": {},
+}
+soup = get_soup("tmux.1", "groff", "mdoc")
+p = soup.find("p", string="CLIENTS AND SESSIONS")
+isoption = 0
+while p and p.text != "EXIT MESSAGES":
+    b = p.find("b")
+    if (
+        isinstance(b, Tag)
+        and b.text == p.text.split()[0]
+        and not isinstance(p, NavigableString)
+        and p.attrs.get("style") == "margin-top: 1em"
+    ):
+        description = p.text.replace("\n", " ")
+        name = b.text
+        p = p.find_next("p")
+        if not p:
+            continue
+        b = p.find("b")
+        alias = None
+        if p.text.startswith(ALIAS_PREFIX) and isinstance(b, Tag):
+            alias = b.text
+            description += "\n" + description.replace(name, alias)
+            p = p.find_next("p")
+        if not p:
+            continue
+        _type = "string"
+        if name.endswith("[]"):
+            name = name.rstrip("[]")
+            _type = "array"
+        if not PAT.fullmatch(name):
+            continue
+        if name == "backspace":
+            isoption = 1
+            schema["properties"]["set-option"]["properties"] = {}
+        s = ""
+        enum = []
+        if isoption:
+            s = "".join(description.split()[1:])
+            if s.startswith("[") and s.endswith("]"):
+                enum = [t.strip() for t in s.strip("[]").split("|")]
+            description = f"""```tmux
+set {description}
+```
+"""
+        else:
+            description = f"""```tmux
+{description}
+```
+"""
+        description += "\n" + p.text.replace("\n", " ")
+        description = description.replace("\u2212", "-")
+        if isoption:
+            schema["properties"]["set-option"]["properties"][name] = {
+                "description": description,
+                "type": _type,
+            }
+            if len(enum) > 1:
+                schema["properties"]["set-option"]["properties"][name][
+                    "enum"
+                ] = enum
+            if s in {
+                "number",
+                "height",
+                "width",
+                "index",
+                "time",
+                "lines",
+            }:
+                schema["properties"]["set-option"]["properties"][name][
+                    "pattern"
+                ] = "\\d+"
+        else:
+            schema["properties"][name] = {"description": description}
+            if alias:
+                schema["properties"][alias] = {"description": description}
+        if name == "window-style":
+            isoption = 0
+    p = p.find_next("p")
+data = {"type": "array", "uniqueItems": True, "items": {"type": "string"}}
+schema["properties"]["source-file"] |= data
+data = {"patternProperties": {"@[-_\\da-zA-Z]": {"type": "string"}}}
+schema["properties"]["set-option"] |= data
+print(schema)
