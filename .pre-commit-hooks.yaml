@@ -1,0 +1,8 @@
+---
+- id: tmux-language-server-check
+  name: tmux language server check
+  description: >
+    Check tmux.conf
+  language: python
+  files: ^tmux\.conf$
+  entry: tmux-language-server --check
