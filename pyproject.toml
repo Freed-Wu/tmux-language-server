@@ -8,8 +8,8 @@ license = "GPL-3.0-or-later"
 authors = [{ name = "Wu, Zhenyu", email = "wuzhenyu@ustc.edu" }]
 keywords = ["json schema", "language server", "tree sitter"]
 dependencies = [
-    "lsp-tree-sitter>=0.2.4",
-    "tree-sitter-tmux>=0.1.1",
+  "lsp-tree-sitter>=0.2.4",
+  "tree-sitter-tmux>=0.1.1",
 ]
 
 [project.urls]
@@ -20,6 +20,11 @@ Source = "https://github.com/Freed-Wu/tmux-language-server"
 
 [project.scripts]
 tmux-language-server = "tmux_language_server.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest-cov>=7.1.0",
+]
 
 [build-system]
 requires = ["uv_build<0.12.0"]
