@@ -38,6 +38,7 @@
 [![pypi/pyversions](https://shields.io/pypi/pyversions/tmux-language-server)](https://pypi.org/project/tmux-language-server/#files)
 
 A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
+Refer [lsp-tree-sitter](https://github.com/neomutt/lsp-tree-sitter).
 
 ![Diagnostic](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a92a7d41-4ade-486b-98ef-14382d6d4722)
 
