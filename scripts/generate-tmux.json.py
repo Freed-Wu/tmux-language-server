@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import re
 
 from bs4.element import NavigableString, Tag
@@ -102,4 +103,4 @@ data = {"type": "array", "uniqueItems": True, "items": {"type": "string"}}
 schema["properties"]["source-file"] |= data
 data = {"patternProperties": {"@[-_\\da-zA-Z]": {"type": "string"}}}
 schema["properties"]["set-option"] |= data
-print(schema)
+print(json.dumps(schema, indent=2))
