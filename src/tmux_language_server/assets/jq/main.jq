@@ -1,7 +1,7 @@
-$nodes[0].type as $type |
+(if $cursor[1] == 0 then "command" else $nodes[0].type end) as $type |
 if $type == "option" then
   .properties["set-option"].properties
-elif $type == "command" or $cursor[1] == 0 then
+elif $type == "command" then
   .properties
 else
   {}
