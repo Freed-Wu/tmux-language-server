@@ -1,5 +1,5 @@
-if $type == "string" then
-  .properties["set-option"].properties[$texts[0]]
+if $nodes[0].type == "string" then
+  .properties["set-option"].properties[$nodes[1].text]
 else
   empty
 end |
@@ -8,7 +8,7 @@ if .enum != null then
 else
   empty
 end |
-if (if $complete then startswith($text) else . == $text end) | not then
+if ($nodes[0].text as $text | if $complete then startswith($text) else . == $text end) | not then
   empty
 end |
 {
