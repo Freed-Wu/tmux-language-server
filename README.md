@@ -1,6 +1,5 @@
 # tmux-language-server
 
-[![readthedocs](https://shields.io/readthedocs/tmux-language-server)](https://tmux-language-server.readthedocs.io)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Freed-Wu/tmux-language-server/main.svg)](https://results.pre-commit.ci/latest/github/Freed-Wu/tmux-language-server/main)
 [![github/workflow](https://github.com/Freed-Wu/tmux-language-server/actions/workflows/main.yml/badge.svg)](https://github.com/Freed-Wu/tmux-language-server/actions)
 [![codecov](https://codecov.io/gh/Freed-Wu/tmux-language-server/branch/main/graph/badge.svg)](https://codecov.io/gh/Freed-Wu/tmux-language-server)
@@ -38,7 +37,6 @@
 [![pypi/pyversions](https://shields.io/pypi/pyversions/tmux-language-server)](https://pypi.org/project/tmux-language-server/#files)
 
 A language server for [tmux](https://github.com/tmux/tmux)'s tmux.conf.
-Refer [lsp-tree-sitter](https://github.com/neomutt/lsp-tree-sitter).
 
 ![Diagnostic](https://github.com/Freed-Wu/tmux-language-server/assets/32936898/a92a7d41-4ade-486b-98ef-14382d6d4722)
 
