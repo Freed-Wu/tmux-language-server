@@ -2,6 +2,7 @@ r"""Server
 ==========
 """
 
+import json
 import os
 
 from lsp_tree_sitter.completer import (
@@ -11,7 +12,7 @@ from lsp_tree_sitter.completer import (
 )
 from lsp_tree_sitter.linter import PathLinter, SchemaLinter
 from lsp_tree_sitter.server import TreeSitterLanguageServer
-from tree_sitter import Language, Parser
+from tree_sitter import Language, Parser, Query
 from tree_sitter_tmux import language as get_language_ptr
 from tree_sitter_tmux import queries
 
@@ -34,9 +35,11 @@ class TmuxLanguageServer(TreeSitterLanguageServer):
             "path", {"tmux.conf": "tmux", "**/tmux.conf": "tmux"}
         )
         path_linter = PathLinter.from_queries(language, queries)
-        schema_linter = SchemaLinter.from_queries(
-            language, queries, schema_file
-        )
+        with open(schema_file) as f:
+            schema = json.load(f)
+        with open(os.path.join(assets_path, "scm", "schema.scm")) as f:
+            query = Query(language, f.read())
+        schema_linter = SchemaLinter.from_schema(query, lambda _: schema)
 
         super().__init__(
             parser,

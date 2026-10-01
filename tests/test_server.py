@@ -16,3 +16,8 @@ class Test:
     def test_complete() -> None:
         contents = server.lookup("option", "set-titles")["set-titles"]
         assert len(contents)
+
+    @staticmethod
+    def test_array_append() -> None:
+        diagnostics = server.lint(file)[file]
+        assert not any(d.range.start.line == 3 for d in diagnostics)
